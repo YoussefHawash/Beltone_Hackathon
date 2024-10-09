@@ -24,7 +24,7 @@ plt.scatter(df.Date,y,s=3)
 plt.plot(df.Date, slope * x + intercept, color='red', label='Line of best fit')
 
 # Text and Show window
-fig.text(0.01, 0, f'Best Fit Line Slope={slope} , Min={y.min()} , Max={y.max()}', ha='left', va='bottom',  fontsize=9)
+fig.text(0.01, 0, f'[Slope={slope}], [Min={y.min()},at {df.iloc[y.idxmin(),0]}], [Max={y.max()},at {df.iloc[y.idxmax(),0]}]', ha='left', va='bottom',  fontsize=9)
 plt.xlabel("Time")
 plt.ylabel("Dollars per Barrel")
 plt.title("Cruide Oil Price {AVG}")
