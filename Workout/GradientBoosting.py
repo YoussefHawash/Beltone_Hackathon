@@ -22,13 +22,13 @@ data['gold_pct_change'] .fillna(0, inplace=True)
 # Split data into training (2020-2022) and testing (2023)
 train_data = data[data['Date'] < '2023-01-01']
 test_data = data[data['Date'] >= '2023-01-01']
-# X_train = pd.DataFrame(train_data['DaysSinceStart']) 
-X_train = train_data.drop(['gold_pct_change', 'Date','DaysSinceStart'], axis=1)
+X_train = pd.DataFrame(train_data['DaysSinceStart']) 
+# X_train = train_data.drop(['gold_pct_change', 'Date','DaysSinceStart'], axis=1)
 
 y_train = train_data['gold_pct_change']
 
-# X_test =  pd.DataFrame(test_data['DaysSinceStart']) 
-X_test = test_data.drop(['gold_pct_change', 'Date','DaysSinceStart'], axis=1)
+X_test =  pd.DataFrame(test_data['DaysSinceStart']) 
+# X_test = test_data.drop(['gold_pct_change', 'Date','DaysSinceStart'], axis=1)
 
 y_test = test_data['gold_pct_change']
 
@@ -61,6 +61,6 @@ grid_search.fit(X_train, y_train)
 best_params = grid_search.best_params_
 print(f'Best Parameters: {best_params}')
 # Predict the gold price change for 1/1/2024
-X_new = test_data.iloc[-1].drop(['gold_pct_change', 'Date'])
+X_new = test_data.iloc[-1].drop(['gold_pct_change', 'Date','DaysSinceStart'])
 gold_change_1_1_2024 = model.predict([X_new])
 print(f'Predicted gold price change for 1/1/2024: {gold_change_1_1_2024[0]:.2f}%')
