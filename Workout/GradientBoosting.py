@@ -1,7 +1,35 @@
+import pandas as pd
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import GridSearchCV
+
+# Load your data
+data = pd.read_csv('InputData\gold_prices.csv', parse_dates=['Date'])
+prec = pd.read_csv('InputData\\target_gold.csv', parse_dates=['Date'])
+
+
+
+# Step 2: Convert Dates to Numeric (days since the first date)
+data['DaysSinceStart'] = (data['Date'] - data['Date'].min()).dt.days
+print (data['DaysSinceStart'])
+# Calculate percentage price change of gold
+
+data['gold_pct_change'] = data['gold_prices'].pct_change() * 100
+data['gold_pct_change'] .fillna(0, inplace=True)
+
+
+
+# Split data into training (2020-2022) and testing (2023)
+train_data = data[data['Date'] < '2023-01-01']
+test_data = data[data['Date'] >= '2023-01-01']
+# X_train = pd.DataFrame(train_data['DaysSinceStart']) 
+X_train = train_data.drop(['gold_pct_change', 'Date','DaysSinceStart'], axis=1)
 
 y_train = train_data['gold_pct_change']
 
-X_test =  pd.DataFrame(test_data['DaysSinceStart']) 
+# X_test =  pd.DataFrame(test_data['DaysSinceStart']) 
+X_test = test_data.drop(['gold_pct_change', 'Date','DaysSinceStart'], axis=1)
+
 y_test = test_data['gold_pct_change']
 
 
