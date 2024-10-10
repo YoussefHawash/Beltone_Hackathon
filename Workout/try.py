@@ -18,6 +18,7 @@ param_dist = {
 # Load your dataset (replace 'Final.csv' with your actual dataset)
 gold_data = pd.read_csv('InputData\Final.csv')
 # Convert 'Date' column to datetime
+print (gold_data)
 gold_data['Date'] = pd.to_datetime(gold_data['Date'])
 
 
