@@ -10,7 +10,7 @@ df = pd.read_csv("Workout\Data\\target_gold.csv")
 # Setting Up Date and Assign fig to the window and setting axis
 df.Date = pd.to_datetime(df.Date)
 fig, ax = plt.subplots()
-y=df['pct_change'] # Define Your y
+y=df['gold_pct_change'] # Define Your y
 # Calc Slope
 x= np.arange(len(y))
 slope, intercept = np.polyfit( x , y, 1)

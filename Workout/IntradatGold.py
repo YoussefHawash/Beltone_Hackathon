@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 plt.rcParams["figure.figsize"] = [7.00, 3.50]
 plt.rcParams["figure.autolayout"] = True
 # Inserting CSV
-df = pd.read_csv("Workout\Data\intraday_gold.csv")
+df = pd.read_csv("Workout\Raw_Data\intraday_gold.csv")
 # Setting Up Date and Assign fig to the window and setting axis
 def parse_mixed_formats(ts):
     if 'T' in ts and '+' in ts:
@@ -24,10 +24,10 @@ y=df.twentyfourK # Define Your y
 x= np.arange(len(y))
 slope, intercept = np.polyfit( x , y, 1)
 # Plot Data
-plt.scatter(df.Timestamp,y,s=5) # Scatter Data
+plt.plot(df.Timestamp,y) # Scatter Data
 #plt.plot(df.Date,y) # Plot Data
 
-plt.plot(df.Timestamp, slope * x + intercept, color='red', label='Line of best fit')
+# plt.plot(df.Timestamp, slope * x + intercept, color='red', label='Line of best fit')
 
 # Text and Show window
 fig.text(0.01, 0, f'[Slope={slope}], [Min={y.min()},at {df.iloc[y.idxmin(),0]}], [Max={y.max()},at {df.iloc[y.idxmax(),0]}]', ha='left', va='bottom',  fontsize=9)

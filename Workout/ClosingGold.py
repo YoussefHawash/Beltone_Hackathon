@@ -6,11 +6,11 @@ import matplotlib.dates as mdates
 plt.rcParams["figure.figsize"] = [7.00, 3.50]
 plt.rcParams["figure.autolayout"] = True
 # Inserting CSV
-df = pd.read_csv("Workout\Data\housing_index.csv")
+df = pd.read_csv("Workout\Data\gold_prices.csv")
 # Setting Up Date and Assign fig to the window and setting axis
 df.Date = pd.to_datetime(df.Date)
 fig, ax = plt.subplots()
-y=df.CSUSHPINSA # Define Your y
+y=df.gold_prices # Define Your y
 # Calc Slope
 x= np.arange(len(y))
 slope, intercept = np.polyfit( x , y, 1)
@@ -23,6 +23,6 @@ plt.plot(df.Date, slope * x + intercept, color='red', label='Line of best fit')
 # Text and Show window
 fig.text(0.01, 0, f'[Slope={slope}], [Min={y.min()},at {df.iloc[y.idxmin(),0]}], [Max={y.max()},at {df.iloc[y.idxmax(),0]}]', ha='left', va='bottom',  fontsize=9)
 plt.xlabel("Time")
-plt.ylabel("CSUSHPINSA")
-plt.title("Housing Inxed")
+plt.ylabel("Y-Label")
+plt.title("Title")
 plt.show()

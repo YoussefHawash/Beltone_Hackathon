@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 plt.rcParams["figure.figsize"] = [7.00, 3.50]
 plt.rcParams["figure.autolayout"] = True
 # Inserting CSV
-df = pd.read_csv("Workout\Data\inflation_year_on_year.csv")
+df = pd.read_csv("Workout\Data\inflation_yoy_headline.csv")
 # Setting Up Date and Assign fig to the window and setting axis
 df.Date = pd.to_datetime(df.Date)
 fig, ax = plt.subplots()

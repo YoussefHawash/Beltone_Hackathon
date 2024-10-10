@@ -6,16 +6,11 @@ import matplotlib.dates as mdates
 plt.rcParams["figure.figsize"] = [7.00, 3.50]
 plt.rcParams["figure.autolayout"] = True
 # Inserting CSV
-df = pd.read_csv("Workout\Data\crude_oil_prices.csv")
+df = pd.read_csv("Workout\Data\\avg_crude_oil.csv")
 # Setting Up Date and Assign fig to the window and setting axis
 df.Date = pd.to_datetime(df.Date)
 fig, ax = plt.subplots()
-# Conditions
-row=df[df.WTI<0].index[0]
-df= df.drop(row)
-filtered_Europe=df[df.Europe>0]
-filtered_WTI=df[df.WTI>0]
-y= (filtered_Europe.WTI+filtered_Europe.Europe)/2
+y=df.avg_oil_price
 # Calc Slope
 x= np.arange(len(y))
 slope, intercept = np.polyfit( x , y, 1)
