@@ -1,4 +1,4 @@
-Date,OvernightDepositRate,OvernightLendingRate
+Date,Overnight Deposit Rate,Overnight Lending Rate
 2020-01-01,9.25,10.25
 2020-01-02,9.25,10.25
 2020-01-03,9.25,10.25
@@ -1458,5 +1458,4 @@ Date,OvernightDepositRate,OvernightLendingRate
 2023-12-27,19.25,20.25
 2023-12-28,19.25,20.25
 2023-12-29,19.25,20.25
-2023-12-30,19.25,20.25
 2023-12-30,19.25,20.25
