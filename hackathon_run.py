@@ -52,22 +52,18 @@ def main(input_path, output_path):
     gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices]) 
 
     gold_data.dropna(inplace=True)
-    print(len(gold_data))
-    features_df =crude_oil_prices.shift(-1)
+
 
     X_test = gold_data.drop(['gold_prices','pct_change'], axis=1)
     Y_test = gold_data['pct_change']
-
-    for column in X_test.columns:
-        decomposition = seasonal_decompose(X_test[column], model='additive', period=30, extrapolate_trend='freq')
-        X_test[f'{column}_trend'] = decomposition.trend
-        X_test[f'{column}_seasonal'] = decomposition.seasonal
-        X_test[f'{column}_residual'] = decomposition.resid
     with open('Pickles/model.pkl', 'rb') as file:
         voting_model = pickle.load(file)
     y_pred = voting_model.predict(X_test)
+    features_df =pd.DataFrame(y_pred).shift(-1)
 
-    
+    rmse_voting = np.sqrt(mean_squared_error(Y_test, y_pred))
+    # Output performance metrics
+    print("RMSE:", rmse_voting)
     # Create output DataFrame and save to CSV
     output_df = pd.DataFrame({
             'date': features_df.index,
