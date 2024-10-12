@@ -83,6 +83,4 @@ def CreateFinal(a):
     df=pd.concat([df, Sotcks(a[6])], axis=1)
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
-    
-
     return df
