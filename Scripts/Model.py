@@ -51,7 +51,7 @@ def train(x,y):
     model.compile(optimizer='adam', loss='mean_squared_error')
 
     # Wrap the LSTM model using KerasRegressor
-    lstm_model = KerasRegressor(model=model, epochs=100, batch_size=32, verbose=1)
+    lstm_model = KerasRegressor(model=model, epochs=20, batch_size=32, verbose=1)
 
     # Reshape the input for LSTM (3D array: [samples, timesteps, features])
 

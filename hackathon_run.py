@@ -1,4 +1,3 @@
-import pandas as pd
 import os
 import argparse
 import pandas as pd
@@ -8,8 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score,f1
 from sklearn.preprocessing import RobustScaler  # Changed to RobustScaler
 
 from scipy import stats
-from Scripts import DataAnalysis, Splitting
-from Pickles import Model, Merging
+from Scripts import DataAnalysis, Splitting,Model, MergingModels,Train,Test
 
 
 def set_date_index(df, date_column):
@@ -50,46 +48,12 @@ def main(input_path, output_path):
     vix_indices = pd.read_csv(os.path.join(input_path, 'vix_index.csv'))
     vixeem_indices = pd.read_csv(os.path.join(input_path, 'vxeem_index.csv'))
     gold_prices = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
-
+   
+    #DEV
+    Train.Train(crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices)
     
-    
-    gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices])
-    gold_data.dropna(inplace=True)
-    X_train, X_test, Y_train, Y_test = Splitting.split_data(gold_data)
-    first,second=Model.train(X_train,Y_train)
-    voting_model= Merging.voting(first,second, X_train, Y_train)
-
-
-
-    Y_pred_voting = voting_model.predict(X_test)
-
-    # Calculate RMSE, MAE, and R^2 Score for the voting model
-    rmse_voting = np.sqrt(mean_squared_error(Y_test, Y_pred_voting))
-    mae_voting = mean_absolute_error(Y_test, Y_pred_voting)
-    r2_voting = r2_score(Y_test, Y_pred_voting)
-    # Output performance metrics
-    print("RMSE:", rmse_voting)
-    print("MAE:", mae_voting)
-    print("R^2", r2_voting)
-    # Calculate actual and predicted directions
-    actual_direction = np.sign(Y_test.values)
-    predicted_direction_voting = np.sign(Y_pred_voting)  # Use predictions from the Voting Regressor
-
-    # Calculate MDA
-    mda = np.mean(actual_direction == predicted_direction_voting)
-    print('MDA:', mda)
-
-    # Plot actual vs predicted values
-    plt.figure(figsize=(10, 6))
-    plt.plot(Y_test.values, color='blue', label='Actual Values')
-    plt.plot(Y_pred_voting, color='red', label='Predicted Values (Voting Model)')
-    plt.title('Actual vs Predicted Gold Price Change')
-    plt.xlabel('Number of Data Points')
-    plt.ylabel('Gold Price Change')
-    plt.legend()
-    plt.show()
-
-
+    #PROD
+    # finalmodel=joblib.load('voting_regressor_model.pkl')
         # # Create output DataFrame and save to CSV
         # output_df = pd.DataFrame({
         #     'date': features_df.index,
