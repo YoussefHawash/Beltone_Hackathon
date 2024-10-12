@@ -55,18 +55,7 @@ def pct_calc(df):
     dfc.dropna(subset=['pct_change'], inplace=True)
     return dfc['pct_change']
     
-def remove_outliers_zscore(df, columns, threshold=3):
-    for col in columns:
-        # Apply Z-score to the non-NaN values, then filter based on the Z-score
-        z_scores = stats.zscore(df[col].dropna())
-        abs_z_scores = abs(z_scores)
-        
-        # Create a boolean mask for values within the threshold
-        mask = abs_z_scores < threshold
-        
-        # Apply mask back to the DataFrame
-        df = df[df.index.isin(df[col].dropna().index[mask])]
-    return df
+
 
 # Apply Z-score method to remove outliers
 def CreateFinal(a):
