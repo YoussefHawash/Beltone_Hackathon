@@ -6,6 +6,7 @@ from scipy import stats
 def Oil_Average(df):
     df.loc[df[df.columns[1]] < 0, df.columns[1]] =  df.loc[df[df.columns[1]] < 0, df.columns[2]]
     df['AVG'] =(df.iloc[:, 1] +df.iloc[:, 2])/2
+    print(df['AVG'] )
     return df['AVG'] 
 def EFFR(df):
     df.EFFR= pd.to_numeric(df.EFFR, errors='coerce').fillna(0).astype(float)
@@ -22,12 +23,20 @@ def Inflation_mom(df):
 def Inflation_yoy(df):
     return df.iloc[:, 1]
 def Intraday(df):
-    for i in range(len(df['24K'])):
-        item = df.loc[i,'Timestamp']
-        df.loc[i,'Timestamp'] = item[:10]
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
-    intraday_gold_last_per_day = df.groupby(df['Timestamp'].dt.date).last().reset_index(drop=True)
-    return intraday_gold_last_per_day.iloc[:, 1]
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce', utc=True)
+
+    # Drop rows with invalid timestamps (if any)
+    df = df.dropna(subset=['Timestamp'])
+
+    # Extract the date from the 'Timestamp' column
+    df['Date'] = df['Timestamp'].dt.date
+
+    # Group by the date and get the last (closing) price for each day
+    closing_prices_df = df.groupby('Date').last().reset_index()
+
+    # Select only the 'Date' and '24K' (closing price) columns
+    closing_prices_df = closing_prices_df[['Date', '24K']]
+    return closing_prices_df.iloc[:, 1]
 def Sotcks(df_stocks):
     new_column_names = []
     for i in range(15):
@@ -60,16 +69,17 @@ def pct_calc(df):
 # Apply Z-score method to remove outliers
 def CreateFinal(a):
     df=pd.DataFrame()
-    df['Date'] = pd.date_range(start='2020-01-01', periods=len(Oil_Average(a[0])), freq='D')
     df['gold_prices']=Intraday(a[9]) 
     df['pct_change']=pct_calc(df)
     df['Oil_AVG']=Oil_Average(a[0])
+    print (df['Oil_AVG'])
     df['EFFR']=EFFR(a[1])
     df['ECIR']=ECIR(a[2]) 
     df['Housing_index']=Housing_index(a[3]) 
     df['Inflation_mom']=Inflation_mom(a[4]) 
     df['Inflation_yoy']=Inflation_yoy(a[5]) 
-    df=pd.concat([df, Sotcks(a[6])], axis=1)
+    # df=pd.concat([df, Sotcks(a[6])], axis=1)
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
+    print(df)
     return df

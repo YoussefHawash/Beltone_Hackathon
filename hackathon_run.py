@@ -2,9 +2,15 @@ import os
 import argparse
 import pandas as pd
 import numpy as np
-from Scripts import DataAnalysis, Splitting,Model, MergingModels,Train,Test
+from Scripts import DataAnalysis
+import pickle
 
-
+from sklearn.ensemble import VotingRegressor
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score,f1_score
+from statsmodels.tsa.seasonal import seasonal_decompose
 def set_date_index(df, date_column):
     """
     Converts a specified date column to a datetime format, sets it as the index,
@@ -31,7 +37,6 @@ def main(input_path, output_path):
     """
     # Load datasets
 
-
     crude_oil_prices = pd.read_csv(os.path.join(input_path, 'crude_oil_prices.csv'))
     federal_rates = pd.read_csv(os.path.join(input_path, 'effective_federal_funds_rate.csv'))
     corridor_rates = pd.read_csv(os.path.join(input_path, 'egyptian_corridor_interest_rates.csv'))
@@ -43,20 +48,34 @@ def main(input_path, output_path):
     vix_indices = pd.read_csv(os.path.join(input_path, 'vix_index.csv'))
     vixeem_indices = pd.read_csv(os.path.join(input_path, 'vxeem_index.csv'))
     gold_prices = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
-   
-    #DEV
-    Train.Train(crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices)
-    
-    #PROD
-    # finalmodel=joblib.load('voting_regressor_model.pkl')
-        # # Create output DataFrame and save to CSV
-        # output_df = pd.DataFrame({
-        #     'date': features_df.index,
-        #     'prediction': y_pred.flatten()
-        # })
 
-        # output_df.to_csv(output_path, index=False)
-        # print(f"Predictions saved to {output_path}")
+    gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices]) 
+
+    gold_data.dropna(inplace=True)
+    print(len(gold_data))
+    features_df =crude_oil_prices.shift(-1)
+
+    X_test = gold_data.drop(['gold_prices','pct_change'], axis=1)
+    Y_test = gold_data['pct_change']
+
+    for column in X_test.columns:
+        decomposition = seasonal_decompose(X_test[column], model='additive', period=30, extrapolate_trend='freq')
+        X_test[f'{column}_trend'] = decomposition.trend
+        X_test[f'{column}_seasonal'] = decomposition.seasonal
+        X_test[f'{column}_residual'] = decomposition.resid
+    with open('Pickles/model.pkl', 'rb') as file:
+        voting_model = pickle.load(file)
+    y_pred = voting_model.predict(X_test)
+
+    
+    # Create output DataFrame and save to CSV
+    output_df = pd.DataFrame({
+            'date': features_df.index,
+            'prediction': y_pred.flatten()
+        })
+
+    output_df.to_csv(output_path, index=False)
+    print(f"Predictions saved to {output_path}")
 
 
 if __name__ == "__main__":
