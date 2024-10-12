@@ -4,8 +4,8 @@ import os
 def Oil_Average(df):
     # df = pd.read_csv(os.path.join(input_path, 'crude_oil_prices.csv'))
     df.loc[df[df.columns[1]] < 0, df.columns[1]] =  df.loc[df[df.columns[1]] < 0, df.columns[2]]
-    df.AVG=(df.iloc[:, 1] +df.iloc[:, 2])/2
-    return df.AVG
+    df['AVG'] =(df.iloc[:, 1] +df.iloc[:, 2])/2
+    return df['AVG'] 
 def EFFR(df):
     # df = pd.read_csv(os.path.join(input_path, 'crude_oil_prices.csv'))
     df.EFFR= pd.to_numeric(df.EFFR, errors='coerce').fillna(0).astype(float)
@@ -44,21 +44,25 @@ def Vxeem(df):
     vxeem_index=(df.iloc[:, 1]+df.iloc[:, 2]+df.iloc[:, 3]+df.iloc[:, 4])/4
     return vxeem_index
 def pct_calc(df):
-    return df
+    dfc=df.copy()
+    dfc['gold_prices_shifted'] = dfc['gold_prices'].shift(-1)
+    dfc['pct_change'] = (dfc['gold_prices_shifted'] - dfc['gold_prices']) / dfc['gold_prices'] * 100
+    dfc.dropna(subset=['pct_change'], inplace=True)
+    return dfc['pct_change']
     
 
 def CreateFinal(a):
     df=pd.DataFrame()
     df['Date'] = pd.date_range(start='2020-01-01', periods=len(Oil_Average(a[0])), freq='D')
+    df['gold_prices']=Intraday(a[9]) 
+    df['pct_change']=pct_calc(df)
     df['Oil_AVG']=Oil_Average(a[0])
     df['EFFR']=EFFR(a[1])
     df['ECIR']=ECIR(a[2]) 
     df['Housing_index']=Housing_index(a[3]) 
     df['Inflation_mom']=Inflation_mom(a[4]) 
     df['Inflation_yoy']=Inflation_yoy(a[5]) 
-    df['Sotcks']=Sotcks(a[6]) 
+    df['stocks']= Sotcks(a[6])
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
-    df['gold_prices']=Intraday(a[9]) 
-    # df['pct_cahnge']=pct_calc(a[9])
     return df
