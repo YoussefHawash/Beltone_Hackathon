@@ -52,6 +52,7 @@ def main(input_path, output_path):
     gold_prices = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
 
     
+    
     gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices])
     gold_data.dropna(inplace=True)
     X_train, X_test, Y_train, Y_test = Splitting.split_data(gold_data)
@@ -66,12 +67,10 @@ def main(input_path, output_path):
     rmse_voting = np.sqrt(mean_squared_error(Y_test, Y_pred_voting))
     mae_voting = mean_absolute_error(Y_test, Y_pred_voting)
     r2_voting = r2_score(Y_test, Y_pred_voting)
-    f1 = f1_score(Y_test, Y_pred_voting)
     # Output performance metrics
     print("RMSE:", rmse_voting)
     print("MAE:", mae_voting)
     print("R^2", r2_voting)
-    print("F1 Score:", f1)
     # Calculate actual and predicted directions
     actual_direction = np.sign(Y_test.values)
     predicted_direction_voting = np.sign(Y_pred_voting)  # Use predictions from the Voting Regressor

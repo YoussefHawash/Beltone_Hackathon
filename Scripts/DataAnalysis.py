@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import os 
+from scipy import stats
+
 def Oil_Average(df):
     df.loc[df[df.columns[1]] < 0, df.columns[1]] =  df.loc[df[df.columns[1]] < 0, df.columns[2]]
     df['AVG'] =(df.iloc[:, 1] +df.iloc[:, 2])/2
@@ -26,15 +28,20 @@ def Intraday(df):
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
     intraday_gold_last_per_day = df.groupby(df['Timestamp'].dt.date).last().reset_index(drop=True)
     return intraday_gold_last_per_day.iloc[:, 1]
-def Sotcks(df):
-    df.fillna(0, inplace=True)
-    sum_of_volumes = df.iloc[:, 16:31].sum(axis=1)
-    sum_of_volumexprices=pd.DataFrame()
-    sum_of_volumexprices=df.iloc[:,1]*df.iloc[:,16]
-    for i in range(2,15):
-        sum_of_volumexprices+=df.iloc[:,i]*df.iloc[:,16+i]
-    stonks=sum_of_volumexprices/sum_of_volumes
-    return stonks
+def Sotcks(df_stocks):
+    new_column_names = []
+    for i in range(15):
+        # Construct price and volume column names based on their index
+        price_col = df_stocks.columns[i+1]  # Price columns start from index 1 (skipping 'Date')
+        volume_col = df_stocks.columns[i+16]  # Volume columns start from index 16
+        
+        # Generate new column name by modifying the stock name from price column
+        new_column_name = f"{price_col.split('_close_price')[0]}_value"
+        new_column_names.append(new_column_name)
+        
+        # Multiply price and volume, and store the result in the new column
+        df_stocks[new_column_name] = df_stocks[price_col] * df_stocks[volume_col]
+    return df_stocks[new_column_names]
 def Vix(df):
     vix_index=(df.iloc[:, 1]+df.iloc[:, 2]+df.iloc[:, 3]+df.iloc[:, 4])/4
     return vix_index
@@ -48,7 +55,20 @@ def pct_calc(df):
     dfc.dropna(subset=['pct_change'], inplace=True)
     return dfc['pct_change']
     
+def remove_outliers_zscore(df, columns, threshold=3):
+    for col in columns:
+        # Apply Z-score to the non-NaN values, then filter based on the Z-score
+        z_scores = stats.zscore(df[col].dropna())
+        abs_z_scores = abs(z_scores)
+        
+        # Create a boolean mask for values within the threshold
+        mask = abs_z_scores < threshold
+        
+        # Apply mask back to the DataFrame
+        df = df[df.index.isin(df[col].dropna().index[mask])]
+    return df
 
+# Apply Z-score method to remove outliers
 def CreateFinal(a):
     df=pd.DataFrame()
     df['Date'] = pd.date_range(start='2020-01-01', periods=len(Oil_Average(a[0])), freq='D')
@@ -60,7 +80,9 @@ def CreateFinal(a):
     df['Housing_index']=Housing_index(a[3]) 
     df['Inflation_mom']=Inflation_mom(a[4]) 
     df['Inflation_yoy']=Inflation_yoy(a[5]) 
-    df['stocks']= Sotcks(a[6])
+    df=pd.concat([df, Sotcks(a[6])], axis=1)
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
+    
+
     return df
