@@ -2,15 +2,9 @@ import os
 import argparse
 import pandas as pd
 import numpy as np
-from Scripts import DataAnalysis
+from Scripts import Model,DataAnalysis
 import pickle
 
-from sklearn.ensemble import VotingRegressor
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score,f1_score
-from statsmodels.tsa.seasonal import seasonal_decompose
 def set_date_index(df, date_column):
     """
     Converts a specified date column to a datetime format, sets it as the index,
@@ -43,27 +37,23 @@ def main(input_path, output_path):
     housing_index = pd.read_csv(os.path.join(input_path, 'housing_index.csv'))
     inflation_mom = pd.read_csv(os.path.join(input_path, 'inflation_month_on_month.csv'))
     inflation_yoy = pd.read_csv(os.path.join(input_path, 'inflation_year_on_year.csv'))
-    news_data = pd.read_csv(os.path.join(input_path, 'news.csv'))
+    news_data = pd.read_excel(os.path.join(input_path, 'news.xlsx'))
     stock_prices = pd.read_csv(os.path.join(input_path, 'stocks_prices_and_volumes.csv'))
     vix_indices = pd.read_csv(os.path.join(input_path, 'vix_index.csv'))
     vixeem_indices = pd.read_csv(os.path.join(input_path, 'vxeem_index.csv'))
     gold_prices = pd.read_csv(os.path.join(input_path, 'intraday_gold.csv'))
 
+    #Features Selection
     gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices]) 
-
     gold_data.dropna(inplace=True)
+    set_date_index(crude_oil_prices,date_column='Date')
 
+    X = gold_data.drop(['gold_prices','pct_change'], axis=1)
 
-    X_test = gold_data.drop(['gold_prices','pct_change'], axis=1)
-    Y_test = gold_data['pct_change']
-    with open('Pickles/model.pkl', 'rb') as file:
-        voting_model = pickle.load(file)
-    y_pred = voting_model.predict(X_test)
-    features_df =pd.DataFrame(y_pred).shift(-1)
-
-    rmse_voting = np.sqrt(mean_squared_error(Y_test, y_pred))
-    # Output performance metrics
-    print("RMSE:", rmse_voting)
+    
+    y_pred = Model.Model(X)
+    features_df =pd.DataFrame(crude_oil_prices)
+    
     # Create output DataFrame and save to CSV
     output_df = pd.DataFrame({
             'date': features_df.index,

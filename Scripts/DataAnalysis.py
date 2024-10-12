@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import os 
-from scipy import stats
 from datetime import datetime
 import pytz
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -100,7 +99,7 @@ def Vxeem(df):
     return vxeem_index
 def pct_calc(df):
     dfc=df.copy()
-    dfc['gold_prices_shifted'] = dfc['gold_prices'].shift(-1)
+    dfc['gold_prices_shifted'] = dfc['gold_prices'].shift(1)
     dfc['pct_change'] = (dfc['gold_prices_shifted'] - dfc['gold_prices']) / dfc['gold_prices'] * 100
     dfc.dropna(subset=['pct_change'], inplace=True)
     return dfc['pct_change']
@@ -123,11 +122,11 @@ def CreateFinal(a):
     
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
-    df=df.drop(df.index[-1])
+    df=df.drop(df.index[0])
     exclude_columns = ['pct_change', 'gold_prices']
+    df.fillna(0, inplace=True)
     for column in df.drop(columns=exclude_columns).columns:
         decomposition = seasonal_decompose(df[column], model='additive', period=30, extrapolate_trend='freq')
-        
         df[f'{column}_trend'] = decomposition.trend
         df[f'{column}_seasonal'] = decomposition.seasonal
         df[f'{column}_residual'] = decomposition.resid
