@@ -2,12 +2,10 @@ import numpy as np
 import pandas as pd
 import os 
 def Oil_Average(df):
-    # df = pd.read_csv(os.path.join(input_path, 'crude_oil_prices.csv'))
     df.loc[df[df.columns[1]] < 0, df.columns[1]] =  df.loc[df[df.columns[1]] < 0, df.columns[2]]
     df['AVG'] =(df.iloc[:, 1] +df.iloc[:, 2])/2
     return df['AVG'] 
 def EFFR(df):
-    # df = pd.read_csv(os.path.join(input_path, 'crude_oil_prices.csv'))
     df.EFFR= pd.to_numeric(df.EFFR, errors='coerce').fillna(0).astype(float)
     return df.EFFR
 

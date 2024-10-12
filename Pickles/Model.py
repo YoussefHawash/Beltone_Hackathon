@@ -6,11 +6,7 @@ from scipy import stats
 from scikeras.wrappers import KerasRegressor
 
 def train(x,y):
-    # Decompose the time series for each feature
-    
-
-    # Drop any NaN values introduced during decomposition
- 
+  
     # Define an optimized parameter grid for RandomizedSearchCV
     param_dist = {
         'learning_rate': [0.01, 0.05, 0.1],
@@ -57,7 +53,6 @@ def train(x,y):
     lstm_model = KerasRegressor(model=model, epochs=100, batch_size=32, verbose=1)
 
     # Reshape the input for LSTM (3D array: [samples, timesteps, features])
-    # X_lstm = x.reshape(x.shape[0], x.shape[1], 1)
 
     # Fit the LSTM model using all data
     lstm_model.fit(x, y)

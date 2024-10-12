@@ -6,7 +6,7 @@ def split_data(All_data):
     train_set=All_data[All_data['Date'] <= '2022-12-31']
     test_set=All_data[All_data['Date'] > '2022-12-31']
 
-   
+
 
 
     X_train = train_set.drop(['Date', 'gold_prices','pct_change'], axis=1)
