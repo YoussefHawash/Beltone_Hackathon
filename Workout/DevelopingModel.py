@@ -24,14 +24,13 @@ from scipy import stats
 def split_data(All_data):
    
     # Split dataset
-    All_data.dropna(inplace=True)
     split_index = int(0.8 * len(All_data))
     train_set = All_data[:split_index]  # First 80% of the data
     test_set = All_data[split_index:]
 
-    X_train = train_set.drop([ 'gold_prices','pct_change'], axis=1)
+    X_train = train_set.drop([ 'Date','gold_prices','pct_change'], axis=1)
     Y_train = train_set['pct_change']
-    X_test = test_set.drop(['gold_prices','pct_change'], axis=1)
+    X_test = test_set.drop(['Date','gold_prices','pct_change'], axis=1)
     Y_test = test_set['pct_change']
 
     

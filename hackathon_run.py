@@ -49,9 +49,7 @@ def main(input_path, output_path):
 
 
     X = gold_data.drop(['Date','gold_prices','pct_change'], axis=1)
-
-    Y= gold_data['pct_change']
-    y_pred = Model.Model(X,Y)
+    y_pred = Model.Model(X)
     
     
     set_date_index(gold_data,date_column='Date')
