@@ -109,6 +109,7 @@ def pct_calc(df):
 # Apply Z-score method to remove outliers
 def CreateFinal(a):
     df=pd.DataFrame()
+    df['Date']=a[0]['Date']
     df['gold_prices']=Intraday(a[9]) 
     df['pct_change']=pct_calc(df)
     df['Oil_AVG']=Oil_Average(a[0])
@@ -122,8 +123,7 @@ def CreateFinal(a):
     
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
-    # df=df.drop(df.index[0])
-    exclude_columns = ['pct_change', 'gold_prices']
+    exclude_columns = ['Date','pct_change', 'gold_prices']
     df.fillna(0, inplace=True)
     for column in df.drop(columns=exclude_columns).columns:
         decomposition = seasonal_decompose(df[column], model='additive', period=30, extrapolate_trend='freq')
