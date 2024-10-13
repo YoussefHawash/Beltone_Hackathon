@@ -127,6 +127,7 @@ def CreateFinal(a):
     df.fillna(0, inplace=True)
     for column in df.drop(columns=exclude_columns).columns:
         decomposition = seasonal_decompose(df[column], model='additive', period=30, extrapolate_trend='freq')
-        # Reconstruct the final observed values
-        df[f'{column}_reconstructed_observed'] = decomposition.trend + decomposition.seasonal + decomposition.resid
+        df[f'{column}_trend'] = decomposition.trend
+        df[f'{column}_seasonal'] = decomposition.seasonal
+        df[f'{column}_residual'] = decomposition.resid
     return df
