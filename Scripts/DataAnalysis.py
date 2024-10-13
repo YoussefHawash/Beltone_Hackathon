@@ -122,7 +122,7 @@ def CreateFinal(a):
     
     df['Vix']=Vix(a[7]) 
     df['Vxeem']=Vxeem(a[8]) 
-    df=df.drop(df.index[0])
+    # df=df.drop(df.index[0])
     exclude_columns = ['pct_change', 'gold_prices']
     df.fillna(0, inplace=True)
     for column in df.drop(columns=exclude_columns).columns:

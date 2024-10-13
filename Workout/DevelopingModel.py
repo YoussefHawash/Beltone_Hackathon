@@ -1,6 +1,7 @@
 import DataAnalysis
 import pickle
 import os
+import sys
 import argparse
 from sklearn.ensemble import VotingRegressor
 import pandas as pd
@@ -14,7 +15,6 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Input
 from scipy import stats
 from scikeras.wrappers  import KerasRegressor
-
 
 
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -143,5 +143,7 @@ def Develop(toggle):
     if toggle:
         trainhybrid(X_train,Y_train)
     Test(X_test,Y_test)
-
+library_path = os.path.abspath('./Libraries')
+if library_path not in sys.path:
+     sys.path.insert(0, library_path)
 Develop(1)

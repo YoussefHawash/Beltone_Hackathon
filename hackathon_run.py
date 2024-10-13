@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from Scripts import Model,DataAnalysis
 import pickle
+import sys
 
 def set_date_index(df, date_column):
     """
@@ -37,7 +38,7 @@ def main(input_path, output_path):
     housing_index = pd.read_csv(os.path.join(input_path, 'housing_index.csv'))
     inflation_mom = pd.read_csv(os.path.join(input_path, 'inflation_month_on_month.csv'))
     inflation_yoy = pd.read_csv(os.path.join(input_path, 'inflation_year_on_year.csv'))
-    news_data = pd.read_excel(os.path.join(input_path, 'news.xlsx'))
+    # news_data = pd.read_excel(os.path.join(input_path, 'news.xlsx'))
     stock_prices = pd.read_csv(os.path.join(input_path, 'stocks_prices_and_volumes.csv'))
     vix_indices = pd.read_csv(os.path.join(input_path, 'vix_index.csv'))
     vixeem_indices = pd.read_csv(os.path.join(input_path, 'vxeem_index.csv'))
@@ -45,20 +46,26 @@ def main(input_path, output_path):
 
     #Features Selection
     gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices]) 
-    gold_data.dropna(inplace=True)
+    gold_data.fillna(0, inplace=True)
+
     set_date_index(crude_oil_prices,date_column='Date')
 
     X = gold_data.drop(['gold_prices','pct_change'], axis=1)
 
-    
-    y_pred = Model.Model(X)
+    Y= gold_data['pct_change']
+    y_pred = Model.Model(X,Y)
     features_df =pd.DataFrame(crude_oil_prices)
     
     # Create output DataFrame and save to CSV
+    if (len(features_df)!= len(y_pred)):
+        y_pred=np.delete(y_pred, 0, axis=0)
+    
     output_df = pd.DataFrame({
-            'date': features_df.index,
-            'prediction': y_pred.flatten()
-        })
+                'date': features_df.index,
+                'prediction': y_pred.flatten()
+            })
+   
+        
 
     output_df.to_csv(output_path, index=False)
     print(f"Predictions saved to {output_path}")
@@ -70,4 +77,8 @@ if __name__ == "__main__":
     parser.add_argument('--input_path', type=str, required=True, help='Path to the input directory.')
     parser.add_argument('--output_path', type=str, required=True, help='Path to the output directory.')
     args = parser.parse_args()
+    library_path = os.path.abspath('./Libraries')
+    if library_path not in sys.path:
+     sys.path.insert(0, library_path)
+# Add the 'Libraries' folder to sys.path if it's not in the same directory
     main(args.input_path, args.output_path)
