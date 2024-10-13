@@ -1,4 +1,4 @@
-import DataAnalysis
+from Scripts import DataAnalysis
 import pickle
 import os
 import sys
@@ -145,3 +145,4 @@ def Develop(toggle):
 library_path = os.path.abspath('./Libraries')
 if library_path not in sys.path:
      sys.path.insert(0, library_path)
+Develop(1)
