@@ -24,6 +24,7 @@ from scipy import stats
 def split_data(All_data):
    
     # Split dataset
+    All_data.dropna(inplace=True)
     split_index = int(0.8 * len(All_data))
     train_set = All_data[:split_index]  # First 80% of the data
     test_set = All_data[split_index:]
@@ -137,8 +138,7 @@ def Develop(toggle):
     vixeem_indices = pd.read_csv('InputData/Raw_Data/vxeem_index.csv')
     gold_prices = pd.read_csv('InputData/Raw_Data/intraday_gold.csv')
     
-    # gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices]) 
-    gold_data=pd.read_csv('InputData\Final.csv')
+    gold_data=DataAnalysis.CreateFinal([crude_oil_prices,federal_rates,corridor_rates,housing_index,inflation_mom,inflation_yoy,stock_prices,vix_indices,vixeem_indices,gold_prices]) 
     X_train, X_test, Y_train, Y_test = split_data(gold_data)
     if toggle:
         trainhybrid(X_train,Y_train)
@@ -146,4 +146,4 @@ def Develop(toggle):
 library_path = os.path.abspath('./Libraries')
 if library_path not in sys.path:
      sys.path.insert(0, library_path)
-Develop(1)
+Develop(0)
